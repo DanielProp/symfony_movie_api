@@ -38,8 +38,14 @@ class APIController extends AbstractController
             return $this->json(['query required']);
         }
         $page = $parameters['page'] ?? 1;
+        $language = $parameters['language'] ?? 'en-US';
 
-        $result = $this->tmdbService->search(TMDBSearchType::fromString($searchType), query: $parameters['query'], page: $page);
+        $result = $this->tmdbService->search(
+            TMDBSearchType::fromString($searchType),
+            query: $parameters['query'],
+            page: $page,
+            language: $language
+        );
         return $this->json($result);
     }
 
@@ -51,9 +57,15 @@ class APIController extends AbstractController
      * @throws ClientExceptionInterface
      */
     #[Route('{searchType}/{id}', name: 'detail', methods: ['GET'])]
-    public function getDetail(string $searchType, int $id): JsonResponse
+    public function getDetail(Request $request, string $searchType, int $id): JsonResponse
     {
-        $result = $this->tmdbService->getDetail(TMDBSearchType::fromString($searchType), id: $id);
+        $parameters = json_decode($request->getContent(), true);
+        $language = $parameters['language'] ?? 'en-US';
+        $result = $this->tmdbService->getDetail(
+            TMDBSearchType::fromString($searchType),
+            id: $id,
+            language: $language
+        );
         return $this->json($result);
     }
 
